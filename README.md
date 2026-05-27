@@ -1,23 +1,21 @@
-# 3D Moto Tactical (CoD Style)
+# 3D Moto: San Andreas Edition
 
-A high-fidelity, tactical 3D motorcycle simulation featuring realistic physics and a modern "Call of Duty" inspired interface.
+A stylized urban motorcycle exploration game inspired by the classic open-world aesthetic of "Grand Theft Auto: San Andreas".
 
 ## Features
 
-- **Tactical HUD**: Modern military-style interface with a compass, digital speedometer, and crosshair.
-- **Pointer Lock Controls**: Smooth, mouse-driven camera look for an immersive tactical experience.
-- **Realistic Physics**: Heavy bike handling with active stabilization for precise navigation.
-- **High-Fidelity Shading**: Realistic PBR materials and soft shadows.
-- **Tactical Environment**: Industrial setting with crates and barriers under low-light tactical conditions.
+- **San Andreas HUD**: Authentic UI featuring the iconic green money display, health/armor bars, and circular mini-map.
+- **Urban Environment**: Drivable city blocks with buildings, palm trees, and streetlights.
+- **Modern Physics**: Heavy bike handling with active stabilization to prevent flipping.
+- **Open World Camera**: Smooth, third-person follow camera designed for exploration.
+- **Vibrant Lighting**: Sunny, golden-hour atmosphere with high-fidelity shadows.
 
 ## Controls
 
-- **Click Screen**: Enable Mouse Look (Pointer Lock)
 - **W**: Accelerate
 - **S**: Reverse / Brake
 - **A / D**: Steer Left / Right
-- **Mouse Move**: Look around
-- **ESC**: Exit Mouse Look
+- **R**: Reset Bike Position
 
 ## Tech Stack
 

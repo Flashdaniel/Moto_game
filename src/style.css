@@ -1,12 +1,12 @@
 body {
   margin: 0;
   overflow: hidden;
-  font-family: 'Courier New', Courier, monospace;
-  background-color: #1a1a1a;
+  font-family: 'Impact', sans-serif;
+  background-color: #87ceeb;
   user-select: none;
 }
 
-#hud {
+#gta-hud {
   position: absolute;
   top: 0;
   left: 0;
@@ -14,64 +14,70 @@ body {
   height: 100%;
   z-index: 100;
   pointer-events: none;
-  color: #00ff00; /* Tactical green */
-  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
 }
 
-.hud-top {
+#money-display {
   position: absolute;
   top: 20px;
-  width: 100%;
+  right: 50px;
+  font-size: 48px;
+  color: #2a7e19; /* Iconic GTA money green */
+  text-shadow: 2px 2px 0px #000;
+  letter-spacing: 2px;
+}
+
+#bars-container {
+  position: absolute;
+  top: 80px;
+  right: 50px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  width: 200px;
 }
 
-#compass {
-  background: rgba(0, 0, 0, 0.5);
-  padding: 5px 20px;
-  border: 1px solid #00ff00;
-  font-size: 18px;
-  letter-spacing: 5px;
+.hud-bar {
+  height: 12px;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.5);
 }
 
-.hud-bottom {
+.health-bar {
+  background: #c30000;
+  width: 100%;
+}
+
+.armor-bar {
+  background: #fff;
+  width: 80%;
+}
+
+#minimap-container {
   position: absolute;
   bottom: 40px;
-  width: 100%;
+  left: 40px;
+  width: 150px;
+  height: 150px;
+  border: 4px solid #000;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
   display: flex;
-  justify-content: space-between;
-  padding: 0 50px;
-  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-.hud-group {
-  background: rgba(0, 0, 0, 0.7);
-  padding: 15px;
-  border-left: 4px solid #00ff00;
-}
-
-.label {
-  font-size: 12px;
-  margin-bottom: 5px;
-  opacity: 0.8;
-}
-
-#speedometer {
-  font-size: 36px;
-  font-weight: bold;
-}
-
-.unit {
-  font-size: 14px;
-}
-
-#crosshair {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 24px;
-  opacity: 0.6;
+#minimap-placeholder {
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    #444,
+    #444 10px,
+    #555 10px,
+    #555 20px
+  );
 }
 
 canvas {

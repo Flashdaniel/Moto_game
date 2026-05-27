@@ -4,25 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>3D Moto Tactical</title>
+    <title>3D Moto - San Andreas</title>
   </head>
   <body>
-    <div id="hud">
-      <div class="hud-top">
-        <div id="compass">N | NW | W | SW | S | SE | E | NE | N</div>
+    <div id="gta-hud">
+      <div id="money-display">$00000000</div>
+      <div id="bars-container">
+        <div class="hud-bar health-bar"></div>
+        <div class="hud-bar armor-bar"></div>
       </div>
-      <div class="hud-bottom">
-        <div class="hud-group">
-          <div class="label">SPEED</div>
-          <div id="speedometer">000</div>
-          <div class="unit">KM/H</div>
-        </div>
-        <div class="hud-group">
-          <div class="label">STATUS</div>
-          <div id="status">ACTIVE</div>
-        </div>
+      <div id="minimap-container">
+        <div id="minimap-placeholder"></div>
       </div>
-      <div id="crosshair">+</div>
     </div>
     <script type="module" src="/src/main.js"></script>
   </body>
