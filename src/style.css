@@ -1,0 +1,33 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #87ceeb; /* Sky blue */
+}
+
+#ui {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  pointer-events: none;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+#score-container {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#instructions {
+  font-size: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+canvas {
+  display: block;
+}
