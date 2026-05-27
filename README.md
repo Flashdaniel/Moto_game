@@ -1,41 +1,25 @@
-# 3D Moto: San Andreas Edition
+# 3D Moto Pro - San Andreas Edition
 
-A stylized urban motorcycle exploration game inspired by the classic open-world aesthetic of "Grand Theft Auto: San Andreas".
+A high-performance, realistic 3D motorcycle game built with Three.js and Cannon-es.
 
 ## Features
 
-- **San Andreas HUD**: Authentic UI featuring the iconic green money display, health/armor bars, and circular mini-map.
-- **Urban Environment**: Drivable city blocks with buildings, palm trees, and streetlights.
-- **Modern Physics**: Heavy bike handling with active stabilization to prevent flipping.
-- **Open World Camera**: Smooth, third-person follow camera designed for exploration.
-- **Vibrant Lighting**: Sunny, golden-hour atmosphere with high-fidelity shadows.
+- **High-Fidelity Graphics:** Cinematic "Golden Hour" lighting, procedural city environment (buildings, palm trees), and PBR (Physically Based Rendering) materials.
+- **Detailed Bike Model:** Custom-built bike with engine block, chrome exhaust, alloy wheels, and functional steering geometry (forks/handlebars).
+- **Advanced Physics:** `RaycastVehicle` system with heavy mass (450kg) and active stabilization that leans the bike into turns for a professional feel.
+- **Immersive Camera:** Speed-dependent FOV scaling and high-speed camera shake.
+- **Modern Controls:**
+  - **WASD:** Move and steer.
+  - **Mouse Look:** Pointer Lock API for full 360-degree camera control.
+  - **R:** Reset bike position.
+- **GTA-Inspired HUD:** Money, health/armor bars, and minimap UI.
 
-## Controls
+## How to Run
 
-- **W**: Accelerate
-- **S**: Reverse / Brake
-- **A / D**: Steer Left / Right
-- **R**: Reset Bike Position
+1. Install dependencies: `npm install`
+2. Start dev server: `npm run dev`
+3. Build for production: `npm run build`
 
-## Tech Stack
-
-- [Three.js](https://threejs.org/) - 3D Graphics Library
-- [Cannon-es](https://github.com/pmndrs/cannon-es) - Physics Engine
-- [Vite](https://vitejs.dev/) - Build Tool
-
-## Development Setup
-
-1. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
-
-2. **Run Development Server**:
-   ```bash
-   npm run dev
-   ```
-
-3. **Build for Production**:
-   ```bash
-   npm run build
-   ```
+## Pro Tips
+- Click anywhere on the screen to lock the mouse and enable 3D camera look.
+- Use 'A' and 'D' to lean and steer; the bike will automatically stabilize for a smooth ride.
