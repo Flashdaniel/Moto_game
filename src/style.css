@@ -1,13 +1,12 @@
 body {
   margin: 0;
   overflow: hidden;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #87ceeb;
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #1a1a1a;
   user-select: none;
-  touch-action: none;
 }
 
-#ui {
+#hud {
   position: absolute;
   top: 0;
   left: 0;
@@ -15,21 +14,27 @@ body {
   height: 100%;
   z-index: 100;
   pointer-events: none;
+  color: #00ff00; /* Tactical green */
+  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
 }
 
-#score-container {
+.hud-top {
   position: absolute;
   top: 20px;
-  left: 20px;
-  font-size: 42px;
-  font-weight: 900;
-  color: #ffcc33;
-  text-shadow: 3px 3px 0px #000;
-  letter-spacing: 2px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
-/* Controls Layout */
-#controls-container {
+#compass {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 5px 20px;
+  border: 1px solid #00ff00;
+  font-size: 18px;
+  letter-spacing: 5px;
+}
+
+.hud-bottom {
   position: absolute;
   bottom: 40px;
   width: 100%;
@@ -37,76 +42,36 @@ body {
   justify-content: space-between;
   padding: 0 50px;
   box-sizing: border-box;
-  pointer-events: auto;
 }
 
-/* Joystick */
-#joystick-base {
-  width: 120px;
-  height: 120px;
-  background: rgba(255, 255, 255, 0.2);
-  border: 4px solid #00ffff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+.hud-group {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+  border-left: 4px solid #00ff00;
 }
 
-#joystick-handle {
-  width: 50px;
-  height: 50px;
-  background: #00ffff;
-  border-radius: 50%;
-  box-shadow: 0 0 10px #00ffff;
+.label {
+  font-size: 12px;
+  margin-bottom: 5px;
+  opacity: 0.8;
 }
 
-/* Buttons */
-#action-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  align-items: flex-end;
+#speedometer {
+  font-size: 36px;
+  font-weight: bold;
 }
 
-.control-btn {
-  width: 100px;
-  height: 60px;
-  background: #ff3333;
-  border: 4px solid #000;
-  border-radius: 12px;
-  color: white;
-  font-weight: 900;
-  font-size: 20px;
-  box-shadow: 4px 4px 0px #000;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.unit {
+  font-size: 14px;
 }
 
-.control-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px #000;
-}
-
-#btn-gas {
-  background: #33ff33;
-  height: 80px;
-  width: 120px;
+#crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-size: 24px;
-}
-
-#btn-brake {
-  background: #ffcc33;
-  color: black;
-}
-
-.control-btn.small {
-  width: 50px;
-  height: 50px;
-  background: #3399ff;
-  font-size: 18px;
+  opacity: 0.6;
 }
 
 canvas {

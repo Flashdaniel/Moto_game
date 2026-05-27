@@ -4,23 +4,25 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>3D Moto Adventure</title>
+    <title>3D Moto Tactical</title>
   </head>
   <body>
-    <div id="ui">
-      <div id="score-container">STARS: <span id="score">0</span></div>
-
-      <!-- Virtual Controls -->
-      <div id="controls-container">
-        <div id="joystick-base">
-          <div id="joystick-handle"></div>
+    <div id="hud">
+      <div class="hud-top">
+        <div id="compass">N | NW | W | SW | S | SE | E | NE | N</div>
+      </div>
+      <div class="hud-bottom">
+        <div class="hud-group">
+          <div class="label">SPEED</div>
+          <div id="speedometer">000</div>
+          <div class="unit">KM/H</div>
         </div>
-        <div id="action-buttons">
-          <button id="btn-gas" class="control-btn">GO</button>
-          <button id="btn-brake" class="control-btn">STOP</button>
-          <button id="btn-reset" class="control-btn small">R</button>
+        <div class="hud-group">
+          <div class="label">STATUS</div>
+          <div id="status">ACTIVE</div>
         </div>
       </div>
+      <div id="crosshair">+</div>
     </div>
     <script type="module" src="/src/main.js"></script>
   </body>
