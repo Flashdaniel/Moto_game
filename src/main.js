@@ -143,6 +143,12 @@ function createBuilding(x, z) {
   mesh.receiveShadow = true;
   scene.add(mesh);
 
+  // Add physics body for building
+  const buildingBody = new CANNON.Body({ mass: 0 });
+  buildingBody.addShape(new CANNON.Box(new CANNON.Vec3(w / 2, h / 2, d / 2)));
+  buildingBody.position.set(x, h / 2, z);
+  world.addBody(buildingBody);
+
   // Add windows
   const winGeo = new THREE.PlaneGeometry(0.5, 0.8);
   const winMat = new THREE.MeshBasicMaterial({ color: 0xffeeaa });
@@ -264,9 +270,24 @@ window.addEventListener('mousemove', (e) => {
   }
 });
 
+const hintEl = document.createElement('div');
+hintEl.style.cssText = 'position:absolute; bottom:20%; left:50%; transform:translateX(-50%); color:red; font-size:24px; font-weight:bold; display:none; text-shadow:2px 2px #000;';
+hintEl.innerText = 'PRESS R TO RESET!';
+document.body.appendChild(hintEl);
+
 function animate() {
   requestAnimationFrame(animate);
   world.step(1/60);
+
+  // Check if upside down
+  const up = new CANNON.Vec3(0, 1, 0);
+  const worldUp = new CANNON.Vec3(0, 1, 0);
+  chassisBody.vectorToWorldFrame(up, worldUp);
+  if (worldUp.y < 0.2) {
+    hintEl.style.display = 'block';
+  } else {
+    hintEl.style.display = 'none';
+  }
 
   // Handling
   input.steering = 0;
@@ -276,17 +297,22 @@ function animate() {
   vehicle.setSteeringValue(input.steering * 0.45, 0);
 
   if (keys['w']) {
-    vehicle.applyEngineForce(-4000, 1);
+    vehicle.applyEngineForce(-6000, 1); // More torque
     vehicle.setBrake(0, 0);
     vehicle.setBrake(0, 1);
   } else if (keys['s']) {
-    vehicle.setBrake(600, 0);
-    vehicle.setBrake(600, 1);
-    vehicle.applyEngineForce(2000, 1);
+    vehicle.setBrake(800, 0);
+    vehicle.setBrake(800, 1);
+    vehicle.applyEngineForce(3000, 1); // Stronger reverse
   } else {
     vehicle.applyEngineForce(0, 1);
-    vehicle.setBrake(40, 0);
-    vehicle.setBrake(40, 1);
+    vehicle.setBrake(100, 0); // Higher passive drag for better control
+    vehicle.setBrake(100, 1);
+  }
+
+  if (keys[' ']) {
+    vehicle.setBrake(2500, 0);
+    vehicle.setBrake(2500, 1);
   }
 
   if (keys['r']) {
@@ -296,13 +322,13 @@ function animate() {
     chassisBody.angularVelocity.set(0, 0, 0);
   }
 
-  // Refined Stabilization
+  // Refined Stabilization (Z-axis is Roll, X-axis is Pitch in Cannon's default Euler 'XYZ')
   const euler = new CANNON.Vec3();
   chassisBody.quaternion.toEuler(euler);
-  const targetLean = -input.steering * 0.25;
+  const targetLean = -input.steering * 0.4; // Lean into the turn
   const upright = new CANNON.Quaternion();
-  upright.setFromEuler(targetLean, euler.y, 0);
-  chassisBody.quaternion.slerp(upright, 0.2, chassisBody.quaternion);
+  upright.setFromEuler(0, euler.y, targetLean);
+  chassisBody.quaternion.slerp(upright, 0.15, chassisBody.quaternion);
 
   // Sync Meshes
   bikeMesh.position.copy(chassisBody.position);
@@ -325,7 +351,7 @@ function animate() {
   const bikeQuat = new THREE.Quaternion(bikeMesh.quaternion.x, bikeMesh.quaternion.y, bikeMesh.quaternion.z, bikeMesh.quaternion.w);
   const lookQuat = new THREE.Quaternion().setFromEuler(new THREE.Euler(mouseY, mouseX, 0, 'YXZ'));
   const finalCamQuat = bikeQuat.clone().multiply(lookQuat);
-  const relOffset = new THREE.Vector3(shake, 1.8 + shake, 5).applyQuaternion(finalCamQuat);
+  const relOffset = new THREE.Vector3(shake, 1.8 + shake, -5).applyQuaternion(finalCamQuat); // Start behind bike
   camera.position.lerp(new THREE.Vector3().copy(bikeMesh.position).add(relOffset), 0.15);
   camera.lookAt(bikeMesh.position.clone().add(new THREE.Vector3(0, 0.8, 0)));
 
