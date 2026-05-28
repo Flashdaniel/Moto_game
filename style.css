@@ -1,0 +1,194 @@
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+    font-family: 'Luckiest Guy', cursive;
+    user-select: none;
+}
+
+canvas {
+    display: block;
+}
+
+#ui-root {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    color: white;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+}
+
+#ui-root button, #ui-root .garage-item {
+    pointer-events: auto;
+}
+
+/* MENUS */
+#menu-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+}
+
+.game-title {
+    font-size: 80px;
+    color: #ffbe0b;
+    margin-bottom: 40px;
+    -webkit-text-stroke: 3px #fb5607;
+    letter-spacing: 4px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.main-btn {
+    background: #f72585;
+    border: 6px solid #b5179e;
+    color: white;
+    padding: 15px 40px;
+    font-size: 32px;
+    border-radius: 50px;
+    cursor: pointer;
+    margin: 10px;
+    font-family: 'Luckiest Guy', cursive;
+    transition: transform 0.1s, filter 0.2s;
+}
+
+.main-btn:hover {
+    filter: brightness(1.2);
+    transform: translateY(-5px) scale(1.1);
+}
+
+.main-btn.secondary {
+    background: #4cc9f0;
+    border-color: #4361ee;
+}
+
+/* HUD */
+#hud {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.hud-item {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 28px;
+}
+
+#speedo-container {
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+    text-align: center;
+}
+
+#speedo-inner {
+    background: rgba(0,0,0,0.6);
+    border: 4px solid #4cc9f0;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#speed-val { font-size: 40px; line-height: 1; }
+#unit { font-size: 14px; opacity: 0.8; }
+
+#nitro-bar-bg {
+    width: 120px;
+    height: 12px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 6px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+#nitro-bar-fill {
+    width: 100%;
+    height: 100%;
+    background: #f72585;
+    transition: width 0.1s;
+}
+
+#announcer {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 60px;
+    color: #ffbe0b;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.announcer-active {
+    opacity: 1 !important;
+    transform: translateX(-50%) scale(1.2) !important;
+}
+
+/* GARAGE */
+.garage-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.garage-item {
+    width: 150px;
+    height: 100px;
+    border-radius: 15px;
+    border: 4px solid rgba(255,255,255,0.3);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.garage-item.selected {
+    border-color: white;
+    box-shadow: 0 0 20px white;
+}
+
+/* MOBILE */
+#mobile-ui {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+.mobile-btn {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 4px solid white;
+    color: white;
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 18px;
+    margin: 10px;
+}
