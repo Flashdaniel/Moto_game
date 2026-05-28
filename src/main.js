@@ -219,11 +219,11 @@ function createGround() {
 createGround();
 
 // --- Physics Vehicle ---
-const chassisBody = new CANNON.Body({ mass: 450 });
+const chassisBody = new CANNON.Body({ mass: 600 }); // Heavier for more stability
 chassisBody.addShape(new CANNON.Box(new CANNON.Vec3(0.25, 0.35, 0.8)));
 chassisBody.position.set(0, 5, 0);
-chassisBody.linearDamping = 0.5;
-chassisBody.angularDamping = 0.7;
+chassisBody.linearDamping = 0.6;
+chassisBody.angularDamping = 0.95; // Stronger damping to prevent weaving
 
 const bikeMesh = createBikeMesh();
 scene.add(bikeMesh);
@@ -232,11 +232,11 @@ const vehicle = new CANNON.RaycastVehicle({ chassisBody });
 const wheelOptions = {
   radius: 0.47,
   directionLocal: new CANNON.Vec3(0, -1, 0),
-  suspensionStiffness: 60,
-  suspensionRestLength: 0.35,
-  frictionSlip: 15,
-  dampingRelaxation: 4.0,
-  dampingCompression: 6.0,
+  suspensionStiffness: 100, // Stiffer suspension
+  suspensionRestLength: 0.3,
+  frictionSlip: 30, // Higher grip to stay in lane
+  dampingRelaxation: 6.0,
+  dampingCompression: 10.0,
   maxSuspensionForce: 1000000,
   axleLocal: new CANNON.Vec3(1, 0, 0),
   chassisConnectionPointLocal: new CANNON.Vec3(0, -0.1, 0.75),
@@ -289,25 +289,24 @@ function animate() {
     hintEl.style.display = 'none';
   }
 
-  // Handling
-  input.steering = 0;
-  if (keys['a']) input.steering = 1;
-  if (keys['d']) input.steering = -1;
+  // Smooth Handling
+  const targetSteering = (keys['a'] ? 1 : 0) + (keys['d'] ? -1 : 0);
+  input.steering += (targetSteering - input.steering) * 0.1; // Smooth interpolation
 
-  vehicle.setSteeringValue(input.steering * 0.45, 0);
+  vehicle.setSteeringValue(input.steering * 0.25, 0); // Direct yet smooth
 
   if (keys['w']) {
-    vehicle.applyEngineForce(-6000, 1); // More torque
+    vehicle.applyEngineForce(-2500, 1); // Reduced speed for better visibility
     vehicle.setBrake(0, 0);
     vehicle.setBrake(0, 1);
   } else if (keys['s']) {
-    vehicle.setBrake(800, 0);
-    vehicle.setBrake(800, 1);
-    vehicle.applyEngineForce(3000, 1); // Stronger reverse
+    vehicle.setBrake(1000, 0);
+    vehicle.setBrake(1000, 1);
+    vehicle.applyEngineForce(1500, 1);
   } else {
     vehicle.applyEngineForce(0, 1);
-    vehicle.setBrake(100, 0); // Higher passive drag for better control
-    vehicle.setBrake(100, 1);
+    vehicle.setBrake(200, 0); // More drag for controlled movement
+    vehicle.setBrake(200, 1);
   }
 
   if (keys[' ']) {
@@ -325,10 +324,15 @@ function animate() {
   // Refined Stabilization (Z-axis is Roll, X-axis is Pitch in Cannon's default Euler 'XYZ')
   const euler = new CANNON.Vec3();
   chassisBody.quaternion.toEuler(euler);
-  const targetLean = -input.steering * 0.4; // Lean into the turn
+  const targetLean = -input.steering * 0.25; // Gentler lean
   const upright = new CANNON.Quaternion();
   upright.setFromEuler(0, euler.y, targetLean);
-  chassisBody.quaternion.slerp(upright, 0.15, chassisBody.quaternion);
+
+  // Only apply stabilization when on the ground to prevent air-weaving
+  const isGrounded = vehicle.wheelInfos.some(w => w.suspensionLength < w.suspensionRestLength);
+  if (isGrounded) {
+    chassisBody.quaternion.slerp(upright, 0.2, chassisBody.quaternion);
+  }
 
   // Sync Meshes
   bikeMesh.position.copy(chassisBody.position);
