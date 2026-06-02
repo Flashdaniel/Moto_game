@@ -3,7 +3,7 @@ import * as CANNON from 'cannon-es';
 import { Materials, Colors } from './materials';
 
 /**
- * MotoRush Kids - Chunk & Prop System
+ * MotoRush Kids - Dirt Track & Nature World Generator
  */
 export class WorldGenerator {
     constructor(scene, world) {
@@ -11,78 +11,76 @@ export class WorldGenerator {
         this.world = world;
         this.chunks = new Map();
         this.chunkSize = 100;
-
-        this.buildingGeo = new THREE.BoxGeometry(20, 1, 20);
     }
 
     generateCityBlock(x, z) {
+        // Re-purposing "CityBlock" to "DirtBiome"
         const group = new THREE.Group();
         group.position.set(x * this.chunkSize, 0, z * this.chunkSize);
 
-        // Ground
+        // Ground (Grass)
         const ground = new THREE.Mesh(new THREE.PlaneGeometry(this.chunkSize, this.chunkSize), Materials.Grass);
         ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;
         group.add(ground);
 
-        // Grid of roads
-        const roadWidth = 15;
+        // Scattered Rocks and Hills instead of Buildings
+        for (let i = 0; i < 8; i++) {
+            const bx = (Math.random() - 0.5) * 80;
+            const bz = (Math.random() - 0.5) * 80;
 
-        // Horizontal Road
-        const roadH = new THREE.Mesh(new THREE.PlaneGeometry(this.chunkSize, roadWidth), Materials.Road);
-        roadH.rotation.x = -Math.PI / 2;
-        roadH.position.y = 0.05;
-        group.add(roadH);
+            // Skip if too close to center (where track usually is)
+            if (Math.abs(bx) < 15 && Math.abs(bz) < 15) continue;
 
-        // Vertical Road
-        const roadV = new THREE.Mesh(new THREE.PlaneGeometry(roadWidth, this.chunkSize), Materials.Road);
-        roadV.rotation.x = -Math.PI / 2;
-        roadV.position.y = 0.1;
-        group.add(roadV);
-
-        // Buildings
-        for (let i = 0; i < 4; i++) {
-            const bx = (i < 2 ? -1 : 1) * 30;
-            const bz = (i % 2 === 0 ? -1 : 1) * 30;
-            const h = 20 + Math.random() * 40;
-
-            const b = new THREE.Mesh(this.buildingGeo, Materials.Building);
-            b.scale.y = h;
-            b.position.set(bx, h / 2, bz);
-            b.castShadow = true;
-            group.add(b);
-
-            // Physics
-            const body = new CANNON.Body({ mass: 0 });
-            body.addShape(new CANNON.Box(new CANNON.Vec3(10, h/2, 10)));
-            body.position.set(x * this.chunkSize + bx, h/2, z * this.chunkSize + bz);
-            this.world.addBody(body);
-        }
-
-        // Streetlights
-        for (let j = -1; j <= 1; j += 2) {
-            this.addStreetLight(group, j * (roadWidth/2 + 2), 0, 10);
-            this.addStreetLight(group, j * (roadWidth/2 + 2), 0, -10);
+            const isTree = Math.random() > 0.4;
+            if (isTree) {
+                this.addTree(group, bx, 0, bz);
+            } else {
+                this.addRock(group, bx, 0, bz, x, z);
+            }
         }
 
         this.scene.add(group);
     }
 
-    addStreetLight(group, x, y, z) {
-        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 8), Materials.Building);
-        pole.position.set(x, 4, z);
-        group.add(pole);
+    addTree(group, x, y, z) {
+        const trunkGeo = new THREE.CylinderGeometry(0.5, 0.8, 4);
+        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4e342e });
+        const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+        trunk.position.set(x, 2, z);
+        group.add(trunk);
 
-        const lamp = new THREE.Mesh(new THREE.BoxGeometry(2, 0.5, 1), Materials.Building);
-        lamp.position.set(x, 8, z);
-        group.add(lamp);
+        const leavesGeo = new THREE.ConeGeometry(3, 8, 8);
+        const leavesMat = new THREE.MeshStandardMaterial({ color: 0x2e7d32 });
+        const leaves = new THREE.Mesh(leavesGeo, leavesMat);
+        leaves.position.set(x, 8, z);
+        group.add(leaves);
 
-        const light = new THREE.PointLight(0xffffaa, 5, 30);
-        light.position.set(x, 7.5, z);
-        group.add(light);
+        // Physics for trunk
+        const body = new CANNON.Body({ mass: 0 });
+        body.addShape(new CANNON.Cylinder(0.5, 0.8, 4, 8));
+        const worldPos = group.position.clone().add(new THREE.Vector3(x, 2, z));
+        body.position.set(worldPos.x, worldPos.y, worldPos.z);
+        this.world.addBody(body);
+    }
+
+    addRock(group, x, y, z, chunkX, chunkZ) {
+        const size = 2 + Math.random() * 5;
+        const rockGeo = new THREE.IcosahedronGeometry(size, 0);
+        const rock = new THREE.Mesh(rockGeo, Materials.Rock);
+        rock.position.set(x, size/2, z);
+        rock.rotation.set(Math.random(), Math.random(), Math.random());
+        group.add(rock);
+
+        const body = new CANNON.Body({ mass: 0 });
+        body.addShape(new CANNON.Sphere(size * 0.8));
+        const worldPos = group.position.clone().add(new THREE.Vector3(x, size/2, z));
+        body.position.set(worldPos.x, worldPos.y, worldPos.z);
+        this.world.addBody(body);
     }
 
     generateBeach(x, z) {
+        // Re-purposing "Beach" to "DustyCanyon"
         const group = new THREE.Group();
         group.position.set(x * this.chunkSize, 0, z * this.chunkSize);
 
@@ -90,6 +88,13 @@ export class WorldGenerator {
         sand.rotation.x = -Math.PI / 2;
         sand.receiveShadow = true;
         group.add(sand);
+
+        // Giant rock formations
+        for(let i=0; i<3; i++) {
+            const rx = (Math.random() - 0.5) * 60;
+            const rz = (Math.random() - 0.5) * 60;
+            this.addRock(group, rx, 0, rz, x, z);
+        }
 
         this.scene.add(group);
     }

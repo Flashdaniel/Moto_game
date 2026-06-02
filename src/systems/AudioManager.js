@@ -1,8 +1,7 @@
 import * as THREE from 'three';
 
 /**
- * MotoRush Kids - Procedural Audio System
- * Uses Web Audio API via Three.js to generate engine & UI sounds without external assets.
+ * MotoRush Kids - Procedural Audio System (Dirt Bike Edition)
  */
 export class AudioManager {
     constructor(camera) {
@@ -19,13 +18,13 @@ export class AudioManager {
         const oscillator = ctx.createOscillator();
         const gain = ctx.createGain();
 
-        oscillator.type = 'sawtooth';
-        oscillator.frequency.setValueAtTime(100, ctx.currentTime);
+        // 2-Stroke dirt bike sound is higher pitched and raspier
+        oscillator.type = 'square';
+        oscillator.frequency.setValueAtTime(150, ctx.currentTime);
 
         gain.gain.setValueAtTime(0, ctx.currentTime);
 
         oscillator.connect(gain);
-        // Connect to Three.js audio node
         const audioNode = this.engineSound.getOutput();
         gain.connect(audioNode);
 
@@ -36,11 +35,12 @@ export class AudioManager {
 
     updateEngine(speed, isNitro) {
         const ctx = this.listener.context;
-        const freq = 100 + (speed * 2) + (isNitro ? 50 : 0);
-        const volume = Math.min(0.1, speed / 200);
+        // Higher base freq and more aggressive scaling for dirt bike
+        const freq = 150 + (speed * 4) + (isNitro ? 100 : 0);
+        const volume = Math.min(0.08, speed / 250);
 
-        this.engineOsc.frequency.setTargetAtTime(freq, ctx.currentTime, 0.1);
-        this.engineGain.gain.setTargetAtTime(volume, ctx.currentTime, 0.1);
+        this.engineOsc.frequency.setTargetAtTime(freq, ctx.currentTime, 0.05);
+        this.engineGain.gain.setTargetAtTime(volume, ctx.currentTime, 0.05);
     }
 
     playCoinSound() {
@@ -49,7 +49,12 @@ export class AudioManager {
     }
 
     playBoostSound() {
-        this.playTone(200, 0.3, 'square');
+        this.playTone(300, 0.4, 'sawtooth');
+    }
+
+    playStuntSound() {
+        this.playTone(600, 0.2, 'sine');
+        setTimeout(() => this.playTone(900, 0.3, 'sine'), 100);
     }
 
     playTone(freq, duration, type = 'sine') {
