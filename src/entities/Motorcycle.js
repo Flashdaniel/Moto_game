@@ -118,4 +118,22 @@ export class Motorcycle {
 
         this.speed = this.chassisBody.velocity.length() * 3.6;
     }
+
+    spawn(pos, quat) {
+        this.chassisBody.position.copy(pos);
+        if (quat) this.chassisBody.quaternion.copy(quat);
+        this.chassisBody.velocity.set(0, 0, 0);
+        this.chassisBody.angularVelocity.set(0, 0, 0);
+
+        // Sync mesh immediately
+        this.mesh.position.copy(this.chassisBody.position);
+        this.mesh.quaternion.copy(this.chassisBody.quaternion);
+    }
+
+    destroy() {
+        this.world.removeBody(this.chassisBody);
+        this.scene.remove(this.mesh);
+        // Remove wheel meshes
+        this.wheelMeshes.forEach(m => this.mesh.remove(m));
+    }
 }

@@ -116,7 +116,7 @@ export class TrackManager {
         mesh.position.copy(pos).add(new THREE.Vector3(0, 1.2, 0));
         mesh.rotation.x = Math.PI / 2;
         this.scene.add(mesh);
-        this.collectibles.push({ mesh, type: 'coin', radius: 1.5 });
+        this.collectibles.push({ mesh, type: 'coin', radius: 1.5, active: true });
     }
 
     createBoostPad(pos) {
@@ -125,7 +125,7 @@ export class TrackManager {
         mesh.position.copy(pos).add(new THREE.Vector3(0, 0.1, 0));
         mesh.rotation.x = -Math.PI / 2;
         this.scene.add(mesh);
-        this.collectibles.push({ mesh, type: 'boost', radius: 2 });
+        this.collectibles.push({ mesh, type: 'boost', radius: 2, active: true });
     }
 
     createRamp(pos, tangent) {
@@ -143,5 +143,37 @@ export class TrackManager {
         body.position.copy(mesh.position);
         body.quaternion.copy(mesh.quaternion);
         this.world.addBody(body);
+    }
+
+    getNearestT(pos) {
+        // Sample the curve to find nearest t
+        let minDist = Infinity;
+        let nearestT = 0;
+        const samples = 50;
+        for (let i = 0; i <= samples; i++) {
+            const t = i / samples;
+            const p = this.curve.getPointAt(t);
+            const d = p.distanceTo(pos);
+            if (d < minDist) {
+                minDist = d;
+                nearestT = t;
+            }
+        }
+        return nearestT;
+    }
+
+    checkCollisions(playerPos, onCollect) {
+        this.collectibles.forEach(c => {
+            if (!c.active) return;
+            const dist = playerPos.distanceTo(c.mesh.position);
+            if (dist < c.radius) {
+                c.active = false;
+                c.mesh.visible = false;
+                onCollect(c.type);
+            }
+            if (c.type === 'coin') {
+                c.mesh.rotation.y += 0.05;
+            }
+        });
     }
 }

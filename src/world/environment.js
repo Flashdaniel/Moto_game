@@ -9,33 +9,46 @@ export function setupRenderer(renderer) {
 }
 
 export const DayNightCycle = {
-    time: 0.5, // 0 to 1
-    duration: 120, // seconds for full cycle
+    time: 0.4, // Start at late morning
+    duration: 180, // 3 minutes for full cycle
 
     update(dt, scene, sun) {
         this.time = (this.time + dt / this.duration) % 1.0;
 
+        // 0.0 = sunrise, 0.25 = noon, 0.5 = sunset, 0.75 = midnight
+        // Shift angle so sin is positive during "day" (0.0 to 0.5)
         const angle = this.time * Math.PI * 2;
-        sun.position.set(Math.cos(angle) * 100, Math.sin(angle) * 100, 50);
+        sun.position.set(
+            Math.cos(angle) * 200,
+            Math.sin(angle) * 200,
+            100
+        );
 
-        // Dynamic Lighting Colors
         const dayColor = new THREE.Color(0x87ceeb);
         const sunsetColor = new THREE.Color(0xff7e5f);
         const nightColor = new THREE.Color(0x0a0a2a);
 
         let currentColor;
-        if (this.time > 0.3 && this.time < 0.7) { // Day
+        let intensity;
+
+        if (this.time < 0.4) { // Day
             currentColor = dayColor;
-            sun.intensity = 1.2;
-        } else if ((this.time >= 0.2 && this.time <= 0.3) || (this.time >= 0.7 && this.time <= 0.8)) { // Golden Hour
-            currentColor = sunsetColor;
-            sun.intensity = 0.8;
-        } else { // Night
+            intensity = 1.2;
+        } else if (this.time < 0.6) { // Sunset / Evening
+            const t = (this.time - 0.4) / 0.2;
+            currentColor = dayColor.clone().lerp(sunsetColor, t);
+            intensity = 1.2 - t * 0.8;
+        } else if (this.time < 0.9) { // Night
             currentColor = nightColor;
-            sun.intensity = 0.1;
+            intensity = 0.1;
+        } else { // Sunrise
+            const t = (this.time - 0.9) / 0.1;
+            currentColor = nightColor.clone().lerp(dayColor, t);
+            intensity = 0.1 + t * 1.1;
         }
 
-        scene.fog.color.lerp(currentColor, 0.05);
+        sun.intensity = intensity;
+        scene.fog.color.copy(currentColor);
         scene.background = currentColor;
     }
 };

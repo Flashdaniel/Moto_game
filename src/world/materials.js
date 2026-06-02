@@ -15,11 +15,11 @@ export const Colors = {
 };
 
 export const Materials = {
-    Road: new THREE.MeshStandardMaterial({ color: Colors.Asphalt, roughness: 0.7, metalness: 0.1 }),
+    Road: new THREE.MeshStandardMaterial({ color: Colors.Asphalt, roughness: 0.8, metalness: 0.1 }),
     Curb: new THREE.MeshStandardMaterial({ color: Colors.Curb, roughness: 0.8 }),
-    Grass: new THREE.MeshStandardMaterial({ color: Colors.Grass, roughness: 0.9 }),
+    Grass: new THREE.MeshStandardMaterial({ color: Colors.Grass, roughness: 1.0 }),
     Sand: new THREE.MeshStandardMaterial({ color: Colors.Sand, roughness: 1.0 }),
-    Building: new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.6 }),
+    Building: new THREE.MeshStandardMaterial({ color: 0x777777, roughness: 0.7 }),
     NeonPink: new THREE.MeshStandardMaterial({ color: Colors.NeonPink, emissive: Colors.NeonPink, emissiveIntensity: 2 }),
     NeonBlue: new THREE.MeshStandardMaterial({ color: Colors.NeonBlue, emissive: Colors.NeonBlue, emissiveIntensity: 2 }),
     Coin: new THREE.MeshStandardMaterial({ color: Colors.Gold, metalness: 0.9, roughness: 0.1, emissive: Colors.Gold, emissiveIntensity: 0.5 })
