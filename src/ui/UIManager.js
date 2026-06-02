@@ -1,186 +1,82 @@
-import { GameState } from '../core/GameManager';
-import { inputManager } from '../systems/InputManager';
-import { saveManager } from '../systems/SaveManager';
+import { GameState, gameManager } from '../core/GameManager';
 
 export class UIManager {
     constructor(gameManager) {
         this.gameManager = gameManager;
         this.init();
-
         gameManager.onStateChange((state) => this.handleStateChange(state));
     }
 
     init() {
-        // Main Container
-        this.container = document.createElement('div');
-        this.container.id = 'ui-root';
-        document.body.appendChild(this.container);
+        this.root = document.createElement('div');
+        this.root.id = 'ui-root';
+        document.body.appendChild(this.root);
 
-        // HUD (Coins, Speed, Nitro)
+        // Vignette
+        const v = document.createElement('div');
+        v.id = 'vignette';
+        this.root.appendChild(v);
+
+        // HUD
         this.hud = document.createElement('div');
         this.hud.id = 'hud';
         this.hud.style.display = 'none';
         this.hud.innerHTML = `
-            <div id="coin-counter" class="hud-item">COINS: 0</div>
-            <div id="announcer"></div>
-            <div id="speedo-container">
-                <div id="speedo-inner">
-                    <span id="speed-val">0</span>
-                    <span id="unit">KM/H</span>
-                </div>
-                <div id="nitro-bar-bg"><div id="nitro-bar-fill"></div></div>
+            <div id="hud-content">
+                <p class="speed-text"><span id="speed-val">0</span> KM/H</p>
+                <div class="nitro-bar-container"><div id="nitro-fill"></div></div>
             </div>
         `;
-        this.container.appendChild(this.hud);
+        this.root.appendChild(this.hud);
 
-        // Menus
+        // Menu
         this.menu = document.createElement('div');
-        this.menu.id = 'menu-container';
-        this.container.appendChild(this.menu);
-
-        // Mobile Controls
-        this.initMobileControls();
-    }
-
-    initMobileControls() {
-        this.mobileUI = document.createElement('div');
-        this.mobileUI.id = 'mobile-ui';
-        this.mobileUI.style.display = 'none';
-        this.mobileUI.innerHTML = `
-            <div id="joystick-zone"></div>
-            <div id="action-buttons">
-                <button id="btn-nitro" class="mobile-btn">NITRO</button>
-                <button id="btn-drift" class="mobile-btn">DRIFT</button>
-            </div>
-        `;
-        this.container.appendChild(this.mobileUI);
-
-        // Touch Listeners
-        const nitroBtn = this.mobileUI.querySelector('#btn-nitro');
-        nitroBtn.addEventListener('touchstart', (e) => { e.preventDefault(); inputManager.setMobileAction('nitro', true); });
-        nitroBtn.addEventListener('touchend', () => inputManager.setMobileAction('nitro', false));
-
-        const driftBtn = this.mobileUI.querySelector('#btn-drift');
-        driftBtn.addEventListener('touchstart', (e) => { e.preventDefault(); inputManager.setMobileAction('drift', true); });
-        driftBtn.addEventListener('touchend', () => inputManager.setMobileAction('drift', false));
-
-        // Joystick (Simplified: Left/Right zones)
-        this.mobileUI.addEventListener('touchstart', (e) => {
-            const x = e.touches[0].clientX;
-            if (x < window.innerWidth / 3) inputManager.setMobileAction('left', true);
-            else if (x > window.innerWidth / 3 && x < (window.innerWidth / 3) * 2) inputManager.setMobileAction('forward', true);
-            else if (x > (window.innerWidth / 3) * 2) inputManager.setMobileAction('right', true);
-        });
-
-        this.mobileUI.addEventListener('touchend', () => {
-            inputManager.setMobileAction('left', false);
-            inputManager.setMobileAction('right', false);
-            inputManager.setMobileAction('forward', false);
-        });
+        this.menu.id = 'menu';
+        this.root.appendChild(this.menu);
     }
 
     handleStateChange(state) {
         this.menu.innerHTML = '';
         this.hud.style.display = 'none';
-        this.mobileUI.style.display = 'none';
+        this.menu.style.display = 'none';
 
-        switch (state) {
-            case GameState.START_MENU:
-                this.showStartMenu();
-                break;
-            case GameState.RACING:
-                this.hud.style.display = 'block';
-                if ('ontouchstart' in window) this.mobileUI.style.display = 'flex';
-                break;
-            case GameState.GARAGE:
-                this.showGarage();
-                break;
+        if (state === GameState.START_MENU) {
+            this.menu.style.display = 'flex';
+            this.showStartMenu();
+        } else if (state === GameState.RACING) {
+            this.hud.style.display = 'block';
+            this.showIntroText();
         }
     }
 
     showStartMenu() {
-        this.menu.innerHTML = '';
         const title = document.createElement('h1');
-        title.innerText = 'MOTORUSH KIDS';
         title.className = 'game-title';
+        title.innerText = 'MOTORUSH: SAN ANDREAS';
 
-        const startBtn = document.createElement('button');
-        startBtn.innerText = 'GO RACING!';
-        startBtn.className = 'main-btn';
-        startBtn.onclick = () => this.gameManager.setState(GameState.RACING);
-
-        const garageBtn = document.createElement('button');
-        garageBtn.innerText = 'GARAGE';
-        garageBtn.className = 'main-btn secondary';
-        garageBtn.onclick = () => this.gameManager.setState(GameState.GARAGE);
+        const btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.innerText = 'RACE START';
+        btn.onclick = () => {
+            this.gameManager.setState(GameState.RACING);
+        };
 
         this.menu.appendChild(title);
-        this.menu.appendChild(startBtn);
-        this.menu.appendChild(garageBtn);
+        this.menu.appendChild(btn);
     }
 
-    showGarage() {
-        this.menu.innerHTML = '';
-        const title = document.createElement('h1');
-        title.innerText = 'GARAGE';
-        title.className = 'game-title';
-
-        const colors = [
-            { id: 'pink', name: 'Neon Pink', hex: 0xf72585, cost: 0 },
-            { id: 'blue', name: 'Cyber Blue', hex: 0x4cc9f0, cost: 50 },
-            { id: 'green', name: 'Slime Green', hex: 0x72efdd, cost: 100 },
-            { id: 'gold', name: 'Gold Rush', hex: 0xffbe0b, cost: 250 }
-        ];
-
-        const grid = document.createElement('div');
-        grid.className = 'garage-grid';
-
-        colors.forEach(c => {
-            const isUnlocked = saveManager.data.unlockedBikes.includes(c.id);
-            const isSelected = saveManager.data.selectedBike === c.id;
-
-            const item = document.createElement('div');
-            item.className = `garage-item ${isSelected ? 'selected' : ''}`;
-            item.style.backgroundColor = `#${c.hex.toString(16).padStart(6, '0')}`;
-
-            let label = isUnlocked ? 'OWNED' : `${c.cost} Coins`;
-            if (isSelected) label = 'EQUIPPED';
-
-            item.innerHTML = `<span>${c.name}</span><br><small>${label}</small>`;
-
-            item.onclick = () => {
-                if (isUnlocked) {
-                    saveManager.selectBike(c.id);
-                    this.showGarage(); // Refresh
-                } else if (saveManager.unlockBike(c.id, c.cost)) {
-                    this.showGarage(); // Refresh
-                } else {
-                    this.announce("NEED MORE COINS!");
-                }
-            };
-            grid.appendChild(item);
-        });
-
-        const backBtn = document.createElement('button');
-        backBtn.innerText = 'BACK';
-        backBtn.className = 'main-btn';
-        backBtn.onclick = () => this.gameManager.setState(GameState.START_MENU);
-
-        this.menu.appendChild(title);
-        this.menu.appendChild(grid);
-        this.menu.appendChild(backBtn);
+    showIntroText() {
+        const intro = document.createElement('div');
+        intro.id = 'intro-overlay';
+        intro.innerText = 'LOS SANTOS DISTRICT';
+        this.root.appendChild(intro);
+        setTimeout(() => { if(intro) intro.remove(); }, 4000);
     }
 
-    updateHUD(speed, nitro, coins) {
-        document.getElementById('speed-val').innerText = Math.floor(speed);
-        document.getElementById('coin-counter').innerText = `COINS: ${coins}`;
-        document.getElementById('nitro-bar-fill').style.width = `${nitro}%`;
-    }
-
-    announce(text) {
-        const el = document.getElementById('announcer');
-        el.innerText = text;
-        el.className = 'announcer-active';
-        setTimeout(() => el.className = '', 1000);
+    updateHUD(speed, nitro) {
+        const s = document.getElementById('speed-val');
+        if (s) s.innerText = Math.floor(speed);
+        const n = document.getElementById('nitro-fill');
+        if (n) n.style.width = `${Math.max(0, nitro)}%`;
     }
 }

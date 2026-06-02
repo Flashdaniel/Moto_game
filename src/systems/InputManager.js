@@ -1,6 +1,6 @@
 /**
  * MotoRush Kids - Input Manager
- * Supports Keyboard and Touch (Mobile)
+ * Supports Keyboard, Touch, and Mouse-Look
  */
 class InputManager {
     constructor() {
@@ -13,7 +13,14 @@ class InputManager {
             drift: false
         };
 
+        this.mouse = {
+            x: 0,
+            y: 0,
+            locked: false
+        };
+
         this.initKeyboard();
+        this.initMouse();
     }
 
     initKeyboard() {
@@ -23,28 +30,36 @@ class InputManager {
 
     handleKey(code, isPressed) {
         switch (code) {
-            case 'ArrowUp':
-            case 'KeyW': this.actions.forward = isPressed; break;
-            case 'ArrowDown':
-            case 'KeyS': this.actions.backward = isPressed; break;
-            case 'ArrowLeft':
-            case 'KeyA': this.actions.left = isPressed; break;
-            case 'ArrowRight':
-            case 'KeyD': this.actions.right = isPressed; break;
+            case 'ArrowUp': case 'KeyW': this.actions.forward = isPressed; break;
+            case 'ArrowDown': case 'KeyS': this.actions.backward = isPressed; break;
+            case 'ArrowLeft': case 'KeyA': this.actions.left = isPressed; break;
+            case 'ArrowRight': case 'KeyD': this.actions.right = isPressed; break;
             case 'Space': this.actions.nitro = isPressed; break;
             case 'ShiftLeft': this.actions.drift = isPressed; break;
         }
     }
 
-    // Called by UIManager for mobile touch inputs
-    setMobileAction(action, value) {
-        if (this.actions.hasOwnProperty(action)) {
-            this.actions[action] = value;
-        }
+    initMouse() {
+        document.addEventListener('click', () => {
+            if (!this.mouse.locked) {
+                document.body.requestPointerLock();
+            }
+        });
+
+        document.addEventListener('pointerlockchange', () => {
+            this.mouse.locked = document.pointerLockElement === document.body;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (this.mouse.locked) {
+                this.mouse.x += e.movementX;
+                this.mouse.y += e.movementY;
+            }
+        });
     }
 
     update() {
-        // Reserved for future smoothing/gamepad polling
+        // Reserved for gamepad polling
     }
 }
 
