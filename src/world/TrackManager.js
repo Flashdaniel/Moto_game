@@ -12,8 +12,8 @@ export class TrackManager {
     createTrack(points) {
         this.curve = new THREE.CatmullRomCurve3(points, true);
 
-        const trackSamples = 600;
-        const width = 15; // Wider for dirt racing
+        const trackSamples = 800; // Increased resolution
+        const width = 18; // Wider track for easier navigation
         const vertices = [];
         const indices = [];
 
@@ -24,8 +24,8 @@ export class TrackManager {
             const up = new THREE.Vector3(0, 1, 0);
             const side = new THREE.Vector3().crossVectors(tangent, up).normalize();
 
-            // Add undulating dirt effect
-            const undulation = Math.sin(t * 100) * 0.3;
+            // Subtler undulation to prevent flipping
+            const undulation = Math.sin(t * 120) * 0.2;
             const p1 = pos.clone().add(side.clone().multiplyScalar(width / 2)).add(new THREE.Vector3(0, undulation, 0));
             const p2 = pos.clone().add(side.clone().multiplyScalar(-width / 2)).add(new THREE.Vector3(0, undulation, 0));
 
@@ -48,17 +48,17 @@ export class TrackManager {
         mesh.receiveShadow = true;
         this.scene.add(mesh);
 
-        // Physics - Use the mesh geometry for better dirt terrain feel
-        // For simplicity in cannon-es we still use boxes but more of them and following terrain
-        for (let i = 0; i < trackSamples; i += 2) {
+        // Physics - Improved collision mesh
+        for (let i = 0; i < trackSamples; i += 1) {
             const t = i / trackSamples;
             const p = this.curve.getPointAt(t);
             const tangent = this.curve.getTangentAt(t);
-            const undulation = Math.sin(t * 100) * 0.3;
+            const undulation = Math.sin(t * 120) * 0.2;
 
             const body = new CANNON.Body({ mass: 0 });
-            body.addShape(new CANNON.Box(new CANNON.Vec3(width / 2, 0.5, 2)));
-            body.position.set(p.x, p.y - 0.5 + undulation, p.z);
+            // Thin but wide boxes to approximate the spline surface
+            body.addShape(new CANNON.Box(new CANNON.Vec3(width / 2, 0.5, 1.2)));
+            body.position.set(p.x, p.y - 0.45 + undulation, p.z);
 
             const quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), tangent);
             body.quaternion.set(quat.x, quat.y, quat.z, quat.w);
@@ -72,7 +72,7 @@ export class TrackManager {
         for (let i = 0; i < 80; i++) {
             const t = Math.random();
             const pos = this.curve.getPointAt(t);
-            const sideOffset = (Math.random() - 0.5) * 10;
+            const sideOffset = (Math.random() - 0.5) * 12;
             const tangent = this.curve.getTangentAt(t);
             const up = new THREE.Vector3(0, 1, 0);
             const side = new THREE.Vector3().crossVectors(tangent, up).normalize();
@@ -81,14 +81,14 @@ export class TrackManager {
 
             if (Math.random() > 0.9) this.createBoostPad(finalPos);
             else if (Math.random() > 0.5) this.createCoin(finalPos);
-            else if (Math.random() > 0.93) this.createRamp(pos, tangent);
+            else if (Math.random() > 0.95) this.createRamp(pos, tangent);
         }
     }
 
     createCoin(pos) {
         const geo = new THREE.CylinderGeometry(0.6, 0.6, 0.15, 16);
         const mesh = new THREE.Mesh(geo, Materials.Coin);
-        mesh.position.copy(pos).add(new THREE.Vector3(0, 2.0, 0)); // Higher for dirt bike
+        mesh.position.copy(pos).add(new THREE.Vector3(0, 2.0, 0));
         mesh.rotation.x = Math.PI / 2;
         this.scene.add(mesh);
         this.collectibles.push({ mesh, type: 'coin', radius: 2.0, active: true });
@@ -104,16 +104,15 @@ export class TrackManager {
     }
 
     createRamp(pos, tangent) {
-        // Larger, more natural ramps for Dirt Bike
-        const width = 8;
-        const length = 12;
-        const height = 4;
+        const width = 10;
+        const length = 14;
+        const height = 3; // Lower height for safer jumping
         const geo = new THREE.BoxGeometry(width, height, length);
         const mesh = new THREE.Mesh(geo, Materials.Dirt);
 
         const quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), tangent);
         mesh.quaternion.copy(quat);
-        mesh.rotation.x -= 0.5; // Steep ramp
+        mesh.rotation.x -= 0.35; // Gentler slope
 
         mesh.position.copy(pos).add(new THREE.Vector3(0, height/2 - 0.5, 0));
         this.scene.add(mesh);
