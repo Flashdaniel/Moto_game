@@ -47,24 +47,21 @@ class Game {
     }
 
     initWorld() {
-        for (let x = -2; x <= 2; x++) {
-            for (let z = -2; z <= 2; z++) {
-                if (Math.abs(x) === 2 || Math.abs(z) === 2) {
-                    this.worldGen.generateBeach(x, z);
-                } else {
-                    this.worldGen.generateCityBlock(x, z);
-                }
-            }
-        }
-
         const points = [];
         const radius = 120;
         for (let i = 0; i < 16; i++) {
             const angle = (i / 16) * Math.PI * 2;
-            const y = Math.sin(i * 1.5) * 8; // More verticality for dirt
+            const y = Math.sin(i * 1.5) * 2; // Reduced verticality for city roads
             points.push(new THREE.Vector3(Math.cos(angle) * radius, y, Math.sin(angle) * radius));
         }
         this.trackManager.createTrack(points);
+
+        // Generate city AFTER track so buildings can avoid it
+        for (let x = -3; x <= 3; x++) {
+            for (let z = -3; z <= 3; z++) {
+                this.worldGen.generateCityBlock(x, z, this.trackManager.curve);
+            }
+        }
 
         const startPos = this.trackManager.curve.getPointAt(0).add(new THREE.Vector3(0, 5, 0));
         const startTangent = this.trackManager.curve.getTangentAt(0);
@@ -121,9 +118,9 @@ class Game {
                 this.juice.shake(0.1);
             }
 
-            // Always emit dirt spray if on ground
-            if (!this.player.isInAir) {
-                this.fx.emitDirtSpray(this.player.mesh.position, this.player.speed);
+            // Smoke particles for city roads instead of dirt
+            if (!this.player.isInAir && this.player.speed > 5) {
+                this.fx.emitNitro(this.player.mesh.position, null); // Re-using nitro for simple smoke
             }
 
             this.trackManager.checkCollisions(this.player.mesh.position, (type) => {
@@ -143,6 +140,7 @@ class Game {
             this.aiRacers.forEach(ai => ai.updateAI(playerProgress, dt));
             this.ui.updateHUD(this.player.speed, this.player.nitroAmount);
         } else {
+            this.player.syncVisuals();
             this.camSystem.updateIntro(dt);
         }
 

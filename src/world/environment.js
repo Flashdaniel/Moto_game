@@ -67,7 +67,7 @@ export function setupEnvironment(scene, world) {
     scene.add(sun);
 
     scene.background = new THREE.Color(0x87ceeb);
-    scene.fog = new THREE.FogExp2(0x87ceeb, 0.005);
+    scene.fog = new THREE.FogExp2(0x87ceeb, 0.002);
 
     return { sun };
 }

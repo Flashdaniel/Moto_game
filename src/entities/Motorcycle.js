@@ -81,14 +81,14 @@ export class Motorcycle {
 
                     // High torque to snap back to upright
                     const angle = Math.acos(Math.max(-1, Math.min(1, dot)));
-                    const strength = 8000;
+                    const strength = 6000; // Slightly lower for smoother stabilization
                     this.chassisBody.torque.x += axis.x * angle * strength;
                     this.chassisBody.torque.y += axis.y * angle * strength;
                     this.chassisBody.torque.z += axis.z * angle * strength;
                 }
 
-                // Add "glue" force to keep bike on track
-                this.chassisBody.applyForce(new CANNON.Vec3(0, -500, 0), this.chassisBody.position);
+                // Add "glue" force to keep bike on track - reduced for less "stuck" feeling
+                this.chassisBody.applyForce(new CANNON.Vec3(0, -200, 0), this.chassisBody.position);
             }
         });
     }
@@ -96,51 +96,74 @@ export class Motorcycle {
     initVisuals() {
         this.mesh = new THREE.Group();
 
-        const bodyMat = new THREE.MeshStandardMaterial({ color: this.color, roughness: 0.3 });
-        const frameMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
+        const bodyMat = new THREE.MeshStandardMaterial({
+            color: this.color,
+            roughness: 0.1,
+            metalness: 0.8,
+            envMapIntensity: 1.0
+        });
+        const frameMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9, roughness: 0.2 });
+        const seatMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9 });
+        const engineMat = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 1.0, roughness: 0.1 });
 
-        // Frame
-        const frameGeo = new THREE.BoxGeometry(0.3, 0.8, 1.5);
+        // Core Frame
+        const frameGeo = new THREE.BoxGeometry(0.25, 0.5, 1.4);
         const frame = new THREE.Mesh(frameGeo, frameMat);
-        frame.position.y = 0.5;
+        frame.position.y = 0.6;
         this.mesh.add(frame);
 
-        // Body
-        const bodyGeo = new THREE.BoxGeometry(0.45, 0.4, 0.9);
-        this.fairing = new THREE.Mesh(bodyGeo, bodyMat);
-        this.fairing.position.set(0, 0.7, 0.2);
+        // Sleek Sport Fairings
+        const fairingGeo = new THREE.BoxGeometry(0.5, 0.7, 1.1);
+        this.fairing = new THREE.Mesh(fairingGeo, bodyMat);
+        this.fairing.position.set(0, 0.85, 0.3);
         this.mesh.add(this.fairing);
 
-        // High Mudguards
-        const guardGeo = new THREE.BoxGeometry(0.4, 0.05, 0.6);
-        const frontGuard = new THREE.Mesh(guardGeo, bodyMat);
-        frontGuard.position.set(0, 0.7, 1.1);
-        frontGuard.rotation.x = -0.3;
-        this.mesh.add(frontGuard);
+        // Windshield Area
+        const shieldGeo = new THREE.BoxGeometry(0.4, 0.3, 0.4);
+        const shield = new THREE.Mesh(shieldGeo, new THREE.MeshStandardMaterial({ color: 0x000000, transparent: true, opacity: 0.7 }));
+        shield.position.set(0, 1.2, 0.7);
+        shield.rotation.x = -0.6;
+        this.mesh.add(shield);
 
-        const rearGuard = new THREE.Mesh(guardGeo, bodyMat);
-        rearGuard.position.set(0, 0.9, -0.8);
-        rearGuard.rotation.x = 0.3;
-        this.mesh.add(rearGuard);
+        // Seat
+        const seatGeo = new THREE.BoxGeometry(0.4, 0.15, 0.7);
+        const seat = new THREE.Mesh(seatGeo, seatMat);
+        seat.position.set(0, 1.05, -0.3);
+        this.mesh.add(seat);
 
-        // Handlebars
-        const bars = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.1), frameMat);
+        // Engine Block Detail
+        const engineGeo = new THREE.BoxGeometry(0.35, 0.4, 0.6);
+        const engine = new THREE.Mesh(engineGeo, engineMat);
+        engine.position.set(0, 0.5, 0.1);
+        this.mesh.add(engine);
+
+        // Handlebars (Sport style)
+        const bars = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.8), frameMat);
         bars.rotation.z = Math.PI / 2;
-        bars.position.set(0, 1.1, 0.7);
+        bars.position.set(0, 1.15, 0.6);
         this.mesh.add(bars);
 
-        // Wheels
-        const wheelGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.3, 16);
+        // Sleek Alloy Wheels
+        const wheelGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.4, 24);
         wheelGeo.rotateZ(Math.PI / 2);
-        const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 1 });
+        const wheelMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.5 });
         this.wheelMeshes = [new THREE.Mesh(wheelGeo, wheelMat), new THREE.Mesh(wheelGeo, wheelMat)];
 
         this.wheelMeshes.forEach(w => {
-            const detail = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.1, 0.32), new THREE.MeshBasicMaterial({color: 0x000000}));
-            for(let i=0; i<4; i++){
-                const d = detail.clone();
-                d.rotation.x = (i/4)*Math.PI;
-                w.add(d);
+            // Rim stripes
+            const rim = new THREE.Mesh(
+                new THREE.TorusGeometry(0.55, 0.05, 8, 24),
+                new THREE.MeshBasicMaterial({ color: this.color })
+            );
+            rim.rotation.y = Math.PI / 2;
+            w.add(rim);
+
+            // Spokes
+            const spokeGeo = new THREE.BoxGeometry(0.05, 1.1, 0.05);
+            for(let i=0; i<3; i++) {
+                const spoke = new THREE.Mesh(spokeGeo, engineMat);
+                spoke.rotation.x = (i/3) * Math.PI;
+                w.add(spoke);
             }
         });
 
@@ -149,8 +172,8 @@ export class Motorcycle {
     }
 
     update(input, dt) {
-        const engineForce = 4000; // Increased for better movement
-        const maxSteer = 0.5;
+        const engineForce = 2200; // Reduced for better control
+        const maxSteer = 0.4;
 
         let grounded = false;
         for (let i = 0; i < this.vehicle.wheelInfos.length; i++) {
@@ -182,13 +205,13 @@ export class Motorcycle {
         }
 
         if (!this.isInAir) {
-            const currentPower = this.nitroActive ? engineForce * 2.5 : engineForce;
+            const currentPower = this.nitroActive ? engineForce * 2.0 : engineForce;
             // Apply engine force to REAR wheel (index 1)
             this.vehicle.applyEngineForce(input.forward ? currentPower : (input.backward ? -engineForce/2 : 0), 1);
             // Apply braking to both if no input
             if(!input.forward && !input.backward) {
-                this.vehicle.setBrake(10, 0);
-                this.vehicle.setBrake(10, 1);
+                this.vehicle.setBrake(15, 0);
+                this.vehicle.setBrake(15, 1);
             } else {
                 this.vehicle.setBrake(0, 0);
                 this.vehicle.setBrake(0, 1);
@@ -200,10 +223,10 @@ export class Motorcycle {
             if (input.right) steer = -maxSteer;
             this.vehicle.setSteeringValue(steer, 0);
 
-            this.chassisBody.angularDamping = 0.8;
+            this.chassisBody.angularDamping = 0.85;
         } else {
-            this.chassisBody.angularDamping = 0.2;
-            const airTorque = 6000;
+            this.chassisBody.angularDamping = 0.3;
+            const airTorque = 4000;
             // WASD Air Control
             if (input.forward) this.chassisBody.torque.x += airTorque;
             if (input.backward) this.chassisBody.torque.x -= airTorque;
@@ -211,7 +234,12 @@ export class Motorcycle {
             if (input.right) this.chassisBody.torque.z -= airTorque;
         }
 
-        // Synchronize visuals
+        this.syncVisuals();
+        this.speed = this.chassisBody.velocity.length() * 3.6;
+    }
+
+    syncVisuals() {
+        // Synchronize visuals with physics
         this.mesh.position.copy(this.chassisBody.position);
         this.mesh.quaternion.copy(this.chassisBody.quaternion);
 
@@ -221,8 +249,6 @@ export class Motorcycle {
             this.wheelMeshes[i].position.copy(t.position);
             this.wheelMeshes[i].quaternion.copy(t.quaternion);
         }
-
-        this.speed = this.chassisBody.velocity.length() * 3.6;
     }
 
     spawn(pos, quat) {
