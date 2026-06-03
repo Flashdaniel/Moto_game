@@ -1,12 +1,27 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MotoRush Kids: San Andreas</title>
-    <link rel="stylesheet" href="./src/style.css">
-</head>
-<body>
-    <script type="module" src="./src/main.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>3D Moto Adventure</title>
+  </head>
+  <body>
+    <div id="ui">
+      <div id="score-container">STARS: <span id="score">0</span></div>
+
+      <!-- Virtual Controls -->
+      <div id="controls-container">
+        <div id="joystick-base">
+          <div id="joystick-handle"></div>
+        </div>
+        <div id="action-buttons">
+          <button id="btn-gas" class="control-btn">GO</button>
+          <button id="btn-brake" class="control-btn">STOP</button>
+          <button id="btn-reset" class="control-btn small">R</button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>

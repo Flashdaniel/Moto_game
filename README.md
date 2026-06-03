@@ -1,25 +1,44 @@
-# 3D Moto Pro - San Andreas Edition
+# 3D Moto Adventure (Donghua Anime Style)
 
-A high-performance, realistic 3D motorcycle game built with Three.js and Cannon-es.
+A vibrant, stylized 3D motorcycle game built for kids using **Three.js** and **Cannon-es**.
 
 ## Features
 
-- **High-Fidelity Graphics:** Cinematic "Golden Hour" lighting, procedural city environment (buildings, palm trees), and PBR (Physically Based Rendering) materials.
-- **Detailed Bike Model:** Custom-built bike with engine block, chrome exhaust, alloy wheels, and functional steering geometry (forks/handlebars).
-- **Advanced Physics:** `RaycastVehicle` system with heavy mass (450kg) and active stabilization that leans the bike into turns for a professional feel.
-- **Immersive Camera:** Speed-dependent FOV scaling and high-speed camera shake.
-- **Modern Controls:**
-  - **WASD:** Move and steer.
-  - **Mouse Look:** Pointer Lock API for full 360-degree camera control.
-  - **R:** Reset bike position.
-- **GTA-Inspired HUD:** Money, health/armor bars, and minimap UI.
+- **Donghua Anime Visuals**: Beautiful cel-shaded graphics with object outlines and a vibrant color palette.
+- **Easy Playability**: Active stabilization system keeps the bike upright, making it perfect for kids to navigate.
+- **Structured Track**: A clearly defined dark track with a glowing neon guiding line.
+- **Interactive Scenery**: Stylized anime trees and low-poly clouds populate the world.
+- **Collectible Stars**: Collect golden rings/stars along the track to increase your score.
+- **Modern HUD**: High-contrast, bold UI with easy-to-read instructions.
 
-## How to Run
+## Controls
 
-1. Install dependencies: `npm install`
-2. Start dev server: `npm run dev`
-3. Build for production: `npm run build`
+- **W / Up Arrow**: Accelerate
+- **S / Down Arrow**: Reverse
+- **A / Left Arrow**: Steer Left
+- **D / Right Arrow**: Steer Right
+- **Space**: Brake
+- **R**: Reset Bike (if you get stuck)
 
-## Pro Tips
-- Click anywhere on the screen to lock the mouse and enable 3D camera look.
-- Use 'A' and 'D' to lean and steer; the bike will automatically stabilize for a smooth ride.
+## Tech Stack
+
+- [Three.js](https://threejs.org/) - 3D Graphics Library
+- [Cannon-es](https://github.com/pmndrs/cannon-es) - Physics Engine
+- [Vite](https://vitejs.dev/) - Build Tool
+
+## Development Setup
+
+1. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Run Development Server**:
+   ```bash
+   npm run dev
+   ```
+
+3. **Build for Production**:
+   ```bash
+   npm run build
+   ```
