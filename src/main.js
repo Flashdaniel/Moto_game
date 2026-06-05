@@ -56,6 +56,7 @@ function createBikeMesh() {
   const seatMat = new THREE.MeshToonMaterial({ color: 0x222222 });
   const metalMat = new THREE.MeshToonMaterial({ color: 0xcccccc });
 
+  // Body faces -Z (negative Z is forward)
   const bodyGeo = new THREE.BoxGeometry(0.5, 0.5, 1.4);
   const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
   bodyMesh.castShadow = true;
@@ -71,6 +72,7 @@ function createBikeMesh() {
 
   const seatGeo = new THREE.BoxGeometry(0.4, 0.1, 0.5);
   const seatMesh = new THREE.Mesh(seatGeo, seatMat);
+  // Seat moved to positive Z (rear)
   seatMesh.position.set(0, 0.25, 0.3);
   seatMesh.add(createOutline(seatMesh, 0.1));
   group.add(seatMesh);
@@ -82,6 +84,23 @@ function createBikeMesh() {
   handleMesh.add(createOutline(handleMesh, 0.2));
   group.add(handleMesh);
 
+  // Forks
+  const forkGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.8);
+  const leftFork = new THREE.Mesh(forkGeo, metalMat);
+  leftFork.position.set(0.15, 0, -0.6);
+  leftFork.rotation.x = 0.2;
+  group.add(leftFork);
+  const rightFork = new THREE.Mesh(forkGeo, metalMat);
+  rightFork.position.set(-0.15, 0, -0.6);
+  rightFork.rotation.x = 0.2;
+  group.add(rightFork);
+
+  // Swingarm
+  const armGeo = new THREE.BoxGeometry(0.1, 0.1, 0.6);
+  const arm = new THREE.Mesh(armGeo, metalMat);
+  arm.position.set(0, -0.15, 0.3);
+  group.add(arm);
+
   const shieldGeo = new THREE.BoxGeometry(0.4, 0.4, 0.05);
   const shieldMat = new THREE.MeshToonMaterial({ color: 0x3399ff, transparent: true, opacity: 0.6 });
   const shieldMesh = new THREE.Mesh(shieldGeo, shieldMat);
@@ -89,18 +108,29 @@ function createBikeMesh() {
   shieldMesh.rotation.x = 0.5;
   group.add(shieldMesh);
 
+  // Nitro Flames
+  const nitroGeo = new THREE.ConeGeometry(0.1, 0.4, 8);
+  nitroGeo.rotateX(-Math.PI / 2);
+  const nitroMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.8 });
+  const nitroMesh = new THREE.Mesh(nitroGeo, nitroMat);
+  nitroMesh.position.set(0, -0.1, 0.7);
+  nitroMesh.visible = false;
+  group.add(nitroMesh);
+  group.nitroEffect = nitroMesh;
+
   return group;
 }
 
 function createWheelMesh() {
-  const wheelGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.2, 24);
+  const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 24);
+  wheelGeo.rotateZ(Math.PI / 2);
   const wheelMat = new THREE.MeshToonMaterial({ color: 0x111111 });
   const wheelMesh = new THREE.Mesh(wheelGeo, wheelMat);
-  wheelMesh.rotation.z = Math.PI / 2;
   wheelMesh.castShadow = true;
   wheelMesh.add(createOutline(wheelMesh, 0.05));
 
-  const rimGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.21, 12);
+  const rimGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.41, 12);
+  rimGeo.rotateZ(Math.PI / 2);
   const rimMat = new THREE.MeshToonMaterial({ color: 0xffffff });
   const rim = new THREE.Mesh(rimGeo, rimMat);
   wheelMesh.add(rim);
@@ -126,6 +156,29 @@ function createCloud(x, y, z) {
     group.add(mesh);
   });
   group.position.set(x, y, z);
+  scene.add(group);
+}
+
+function createBuilding(x, z) {
+  const h = 5 + Math.random() * 10;
+  const w = 4 + Math.random() * 3;
+  const group = new THREE.Group();
+  const mat = new THREE.MeshToonMaterial({ color: 0x888888 });
+  const geo = new THREE.BoxGeometry(w, h, w);
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.add(createOutline(mesh, 0.02));
+  group.add(mesh);
+
+  // Windows
+  const winGeo = new THREE.PlaneGeometry(0.5, 0.5);
+  const winMat = new THREE.MeshBasicMaterial({ color: 0xffffcc });
+  for (let i = 0; i < 5; i++) {
+    const win = new THREE.Mesh(winGeo, winMat);
+    win.position.set(0, (i - 2) * 1.5, w/2 + 0.01);
+    mesh.add(win);
+  }
+
+  group.position.set(x, h / 2, z);
   scene.add(group);
 }
 
@@ -155,15 +208,15 @@ function createGround() {
   mesh.position.y = -0.01;
   scene.add(mesh);
 
-  const trackGeo = new THREE.PlaneGeometry(12, 1000);
-  const trackMat = new THREE.MeshToonMaterial({ color: 0x444444 });
+  const trackGeo = new THREE.PlaneGeometry(14, 1000);
+  const trackMat = new THREE.MeshToonMaterial({ color: 0x333333 });
   const trackMesh = new THREE.Mesh(trackGeo, trackMat);
   trackMesh.rotation.x = -Math.PI / 2;
   trackMesh.receiveShadow = true;
   scene.add(trackMesh);
 
-  const lineGeo = new THREE.PlaneGeometry(0.2, 1000);
-  const lineMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.5 });
+  const lineGeo = new THREE.PlaneGeometry(0.4, 1000);
+  const lineMat = new THREE.MeshToonMaterial({ color: 0xffcc00 });
   const lineMesh = new THREE.Mesh(lineGeo, lineMat);
   lineMesh.rotation.x = -Math.PI / 2;
   lineMesh.position.y = 0.01;
@@ -198,6 +251,37 @@ function createRamp(x, z, rotation) {
   world.addBody(body);
 }
 
+function createAI(x, z, color = 0x3333ff) {
+  const group = new THREE.Group();
+  const bodyMat = new THREE.MeshToonMaterial({ color: color });
+  const metalMat = new THREE.MeshToonMaterial({ color: 0xcccccc });
+
+  const bodyGeo = new THREE.BoxGeometry(0.5, 0.5, 1.4);
+  const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+  bodyMesh.add(createOutline(bodyMesh, 0.08));
+  group.add(bodyMesh);
+
+  const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 12);
+  wheelGeo.rotateZ(Math.PI / 2);
+  const wheelMat = new THREE.MeshToonMaterial({ color: 0x111111 });
+  const w1 = new THREE.Mesh(wheelGeo, wheelMat);
+  w1.position.set(0, -0.2, 0.6);
+  group.add(w1);
+  const w2 = new THREE.Mesh(wheelGeo, wheelMat);
+  w2.position.set(0, -0.2, -0.6);
+  group.add(w2);
+
+  group.position.set(x, 0.6, z);
+  group.speed = 15 + Math.random() * 10;
+  scene.add(group);
+  return group;
+}
+
+const ais = [];
+for (let i = 0; i < 5; i++) {
+  ais.push(createAI((Math.random() - 0.5) * 10, -50 - i * 100));
+}
+
 function createStar(x, z) {
   const geometry = new THREE.TorusGeometry(0.5, 0.2, 8, 16);
   const material = new THREE.MeshToonMaterial({ color: 0xffff00 });
@@ -218,9 +302,13 @@ for (let i = 0; i < 10; i++) {
 for (let i = 0; i < 50; i++) {
   createStar((Math.random() - 0.5) * 8, -i * 10);
 }
-for (let i = 0; i < 40; i++) {
+for (let i = 0; i < 60; i++) {
   const side = i % 2 === 0 ? 1 : -1;
-  createTree(side * (10 + Math.random() * 20), -i * 20);
+  if (i % 3 === 0) {
+    createBuilding(side * (15 + Math.random() * 5), -i * 20);
+  } else {
+    createTree(side * (10 + Math.random() * 10), -i * 20);
+  }
 }
 for (let i = 0; i < 15; i++) {
   createCloud((Math.random()-0.5)*100, 10 + Math.random()*10, (Math.random()-0.5)*200);
@@ -232,34 +320,54 @@ const chassisBody = new CANNON.Body({ mass: 150 });
 chassisBody.addShape(chassisShape);
 chassisBody.position.set(0, 4, 0);
 chassisBody.linearDamping = 0.5;
-chassisBody.angularDamping = 0.5;
-
+chassisBody.angularDamping = 0.98;
 const bikeMesh = createBikeMesh();
+window.bikeMesh = bikeMesh;
 scene.add(bikeMesh);
 
-const vehicle = new CANNON.RaycastVehicle({ chassisBody });
+const vehicle = new CANNON.RaycastVehicle({
+  chassisBody,
+  indexRightAxis: 0,
+  indexUpAxis: 1,
+  indexForwardAxis: 2
+});
+window.vehicle = vehicle;
 
-const wheelOptions = {
-  radius: 0.35,
+// Wheel 0: Front (Steering)
+vehicle.addWheel({
+  radius: 0.4,
   directionLocal: new CANNON.Vec3(0, -1, 0),
-  suspensionStiffness: 40,
-  suspensionRestLength: 0.35,
-  frictionSlip: 10,
+  suspensionStiffness: 60,
+  suspensionRestLength: 0.4,
+  frictionSlip: 15,
   dampingRelaxation: 2.5,
   dampingCompression: 4.5,
   maxSuspensionForce: 100000,
   rollInfluence: 0.01,
   axleLocal: new CANNON.Vec3(1, 0, 0),
-  chassisConnectionPointLocal: new CANNON.Vec3(1, 1, 1),
+  chassisConnectionPointLocal: new CANNON.Vec3(0, -0.15, -0.6),
   maxSuspensionTravel: 0.3,
   customSlidingRotationalSpeed: -30,
   useCustomSlidingRotationalSpeed: true,
-};
+});
 
-wheelOptions.chassisConnectionPointLocal.set(0, -0.1, -0.6); // Front
-vehicle.addWheel(wheelOptions);
-wheelOptions.chassisConnectionPointLocal.set(0, -0.1, 0.6); // Rear
-vehicle.addWheel(wheelOptions);
+// Wheel 1: Rear (Engine)
+vehicle.addWheel({
+  radius: 0.4,
+  directionLocal: new CANNON.Vec3(0, -1, 0),
+  suspensionStiffness: 60,
+  suspensionRestLength: 0.4,
+  frictionSlip: 15,
+  dampingRelaxation: 2.5,
+  dampingCompression: 4.5,
+  maxSuspensionForce: 100000,
+  rollInfluence: 0.01,
+  axleLocal: new CANNON.Vec3(1, 0, 0),
+  chassisConnectionPointLocal: new CANNON.Vec3(0, -0.15, 0.6),
+  maxSuspensionTravel: 0.3,
+  customSlidingRotationalSpeed: -30,
+  useCustomSlidingRotationalSpeed: true,
+});
 
 vehicle.addToWorld(world);
 
@@ -273,6 +381,11 @@ vehicle.wheelInfos.forEach(() => {
 // --- Scoring ---
 let score = 0;
 const scoreElement = document.getElementById('score');
+const speedElement = document.getElementById('speed');
+const nitroBar = document.getElementById('nitro-bar');
+
+let nitroFuel = 100;
+
 function checkCollisions() {
   for (let i = stars.length - 1; i >= 0; i--) {
     const star = stars[i];
@@ -287,10 +400,50 @@ function checkCollisions() {
   }
 }
 
+// --- Audio Engine ---
+class EngineSound {
+  constructor() {
+    this.context = null;
+    this.oscillator = null;
+    this.gainNode = null;
+    this.active = false;
+  }
+
+  init() {
+    this.context = new (window.AudioContext || window.webkitAudioContext)();
+    this.gainNode = this.context.createGain();
+    this.gainNode.gain.value = 0;
+    this.gainNode.connect(this.context.destination);
+
+    this.oscillator = this.context.createOscillator();
+    this.oscillator.type = 'sawtooth';
+    this.oscillator.frequency.value = 50;
+    this.oscillator.connect(this.gainNode);
+    this.oscillator.start();
+    this.active = true;
+  }
+
+  update(speed, isAccelerating) {
+    if (!this.active) return;
+
+    // Pitch based on speed
+    const baseFreq = 40;
+    const targetFreq = baseFreq + speed * 4 + (isAccelerating ? 20 : 0);
+    this.oscillator.frequency.setTargetAtTime(targetFreq, this.context.currentTime, 0.1);
+
+    // Volume
+    const targetGain = 0.1 + (speed / 100) + (isAccelerating ? 0.05 : 0);
+    this.gainNode.gain.setTargetAtTime(targetGain, this.context.currentTime, 0.1);
+  }
+}
+
+const engineSound = new EngineSound();
+
 // --- Modern Controls ---
 const input = {
   forward: false,
   backward: false,
+  nitro: false,
   steering: 0, // -1 to 1
   reset: false
 };
@@ -309,6 +462,7 @@ window.addEventListener('keyup', (e) => {
 function updateInputFromKeys() {
   input.forward = !!(keys['w'] || keys['arrowup']);
   input.backward = !!(keys['s'] || keys['arrowdown'] || keys[' ']);
+  input.nitro = !!(keys['shift']);
   input.reset = !!keys['r'];
 
   if (keys['a'] || keys['arrowleft']) input.steering = 0.6;
@@ -373,6 +527,14 @@ btnBrake.addEventListener('touchstart', (e) => { input.backward = true; e.preven
 btnBrake.addEventListener('mouseup', () => { if (!keys['s'] && !keys[' ']) input.backward = false; });
 btnBrake.addEventListener('touchend', () => { if (!keys['s'] && !keys[' ']) input.backward = false; });
 
+const startButton = document.getElementById('start-button');
+const startOverlay = document.getElementById('start-overlay');
+
+startButton.addEventListener('click', () => {
+  engineSound.init();
+  startOverlay.style.display = 'none';
+});
+
 btnReset.addEventListener('click', () => {
   chassisBody.position.set(0, 4, 0);
   chassisBody.quaternion.set(0, 0, 0, 1);
@@ -381,23 +543,28 @@ btnReset.addEventListener('click', () => {
 });
 
 function handlePhysicsControls() {
-  const maxForce = 2000;
-  const brakeForce = 250;
+  let maxForce = 2500;
+  const brakeForce = 600;
 
-  vehicle.setSteeringValue(input.steering, 0); // Front wheel
+  const canUseNitro = input.nitro && nitroFuel > 0;
+  if (canUseNitro) {
+    maxForce *= 2.5;
+  }
+
+  vehicle.setSteeringValue(input.steering, 0); // Wheel 0 is front
 
   if (input.forward) {
-    vehicle.applyEngineForce(maxForce, 1); // Rear wheel
+    vehicle.applyEngineForce(maxForce, 1); // Positive moves towards -Z (forward)
     vehicle.setBrake(0, 0);
     vehicle.setBrake(0, 1);
   } else if (input.backward) {
     vehicle.setBrake(brakeForce, 0);
     vehicle.setBrake(brakeForce, 1);
-    vehicle.applyEngineForce(-maxForce * 0.5, 1); // Reverse a bit
+    vehicle.applyEngineForce(-maxForce * 0.5, 1); // Reverse
   } else {
     vehicle.applyEngineForce(0, 1);
-    vehicle.setBrake(5, 0); // Gentle friction
-    vehicle.setBrake(5, 1);
+    vehicle.setBrake(10, 0); // Gentle friction
+    vehicle.setBrake(10, 1);
   }
 
   if (input.reset) {
@@ -418,14 +585,65 @@ window.addEventListener('resize', () => {
 function animate() {
   requestAnimationFrame(animate);
   world.step(1/60);
+
+  const canUseNitro = input.nitro && nitroFuel > 0;
+
+  ais.forEach(ai => {
+    ai.position.z -= ai.speed / 60;
+    ai.rotation.z = Math.sin(Date.now() * 0.01) * 0.1; // Slight wiggle
+    if (ai.position.z < bikeMesh.position.z - 100) {
+      ai.position.z -= 500; // Loop them
+      ai.position.x = (Math.random() - 0.5) * 10;
+    }
+  });
+
+  if (bikeMesh.nitroEffect) {
+    bikeMesh.nitroEffect.visible = canUseNitro && input.forward;
+    if (bikeMesh.nitroEffect.visible) {
+      bikeMesh.nitroEffect.scale.setScalar(1 + Math.random() * 0.5);
+    }
+  }
+
   handlePhysicsControls();
   checkCollisions();
 
+  const speedValue = Math.abs(chassisBody.velocity.z);
+  engineSound.update(speedValue, input.forward);
+
+  // Update HUD
+  if (speedElement) speedElement.innerText = Math.round(speedValue * 3.6);
+  if (canUseNitro && input.forward) {
+    nitroFuel -= 0.5;
+  } else {
+    nitroFuel = Math.min(100, nitroFuel + 0.1);
+  }
+  if (nitroBar) {
+    nitroBar.style.width = `${nitroFuel}%`;
+    nitroBar.style.background = nitroFuel < 20 ? '#ff3333' : '#00ffff';
+  }
+
+  // Glue bike to ground for stability
+  chassisBody.applyForce(new CANNON.Vec3(0, -1000, 0), chassisBody.position);
+
+  // Active upright torque
+  const quat = chassisBody.quaternion;
   const euler = new CANNON.Vec3();
-  chassisBody.quaternion.toEuler(euler);
-  const uprightQuaternion = new CANNON.Quaternion();
-  uprightQuaternion.setFromEuler(0, euler.y, 0);
-  chassisBody.quaternion.slerp(uprightQuaternion, 0.15, chassisBody.quaternion);
+  quat.toEuler(euler);
+
+  // Apply torque to cancel out tilt (X and Z)
+  const torque = new CANNON.Vec3(-euler.x * 2000, 0, -euler.z * 5000);
+  chassisBody.applyTorque(torque);
+
+  // Dynamic FOV
+  camera.fov = 75 + speedValue * 0.5;
+  camera.updateProjectionMatrix();
+
+  // Keep bike upright with slerp (visual and physics helper)
+  const currentEuler = new CANNON.Vec3();
+  chassisBody.quaternion.toEuler(currentEuler);
+  const uprightQuat = new CANNON.Quaternion();
+  uprightQuat.setFromEuler(0, currentEuler.y, 0);
+  chassisBody.quaternion.slerp(uprightQuat, 0.1, chassisBody.quaternion);
 
   bikeMesh.position.copy(chassisBody.position);
   bikeMesh.quaternion.copy(chassisBody.quaternion);
@@ -438,8 +656,9 @@ function animate() {
   }
 
   const cameraOffset = new THREE.Vector3(0, 2.5, 7);
-  const bikeQuat = new THREE.Quaternion(bikeMesh.quaternion.x, bikeMesh.quaternion.y, bikeMesh.quaternion.z, bikeMesh.quaternion.w);
-  const relativeCameraOffset = cameraOffset.clone().applyQuaternion(bikeQuat);
+  // Follow only yaw to keep camera stable even when bike leans
+  const bikeYawOnly = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, bikeMesh.rotation.y, 0));
+  const relativeCameraOffset = cameraOffset.clone().applyQuaternion(bikeYawOnly);
   const cameraPosition = new THREE.Vector3().copy(bikeMesh.position).add(relativeCameraOffset);
   camera.position.lerp(cameraPosition, 0.1);
   camera.lookAt(bikeMesh.position.clone().add(new THREE.Vector3(0, 1, 0)));

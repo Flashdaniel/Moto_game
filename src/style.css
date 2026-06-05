@@ -17,15 +17,50 @@ body {
   pointer-events: none;
 }
 
-#score-container {
+#top-ui {
   position: absolute;
   top: 20px;
   left: 20px;
-  font-size: 42px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#score-container, #speed-container {
+  font-size: 32px;
   font-weight: 900;
   color: #ffcc33;
   text-shadow: 3px 3px 0px #000;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
+}
+
+#speed-container {
+  color: #00ffff;
+  font-size: 24px;
+}
+
+#nitro-bar-container {
+  position: absolute;
+  top: 100px;
+  left: 20px;
+  width: 200px;
+  height: 30px;
+  background: rgba(0,0,0,0.5);
+  border: 3px solid #000;
+  border-radius: 5px;
+}
+
+#nitro-bar {
+  width: 100%;
+  height: 100%;
+  background: #00ffff;
+  color: #000;
+  font-weight: 900;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.1s;
 }
 
 /* Controls Layout */
@@ -107,6 +142,49 @@ body {
   height: 50px;
   background: #3399ff;
   font-size: 18px;
+}
+
+#start-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  color: white;
+  text-align: center;
+}
+
+#start-overlay h1 {
+  font-size: 64px;
+  color: #ffcc33;
+  text-shadow: 4px 4px 0 #000;
+  margin-bottom: 20px;
+}
+
+#start-button {
+  padding: 20px 40px;
+  font-size: 32px;
+  background: #33ff33;
+  border: 6px solid #000;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 900;
+  box-shadow: 6px 6px 0 #000;
+}
+
+#start-button:hover {
+  background: #22ee22;
+}
+
+#start-button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 #000;
 }
 
 canvas {
